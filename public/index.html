@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Awesome chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <ul class="pages">
+    <li class="chat page">
+      <div class="chatArea">
+        <ul class="messages"></ul>
+      </div>
+      <input class="inputMessage" placeholder="Message..."/>
+    </li>
+    <li class="login page">
+      <h2 class="title center">Welcome to this awesome chat!</h2>
+      <form class="form">
+        <h3 class="title">Please, select the room:</h3>
+        <select name="room" id="room" class="roomSelect">
+          <option value="girls">for girls</option>
+          <option value="boys">for boys</option>
+          <option value="jedi" selected="true">for jedi</option>
+        </select>
+        <h3 class="title">What's your nickname?</h3>
+        <input class="usernameInput" type="text" maxlength="14" />
+        <button type="submit" class="enterBtn">Enter chat!</button>
+      </form>
+    </li>
+  </ul>
+
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="./socket.io/socket.io.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>
