@@ -101,7 +101,17 @@ ul {
   color: #fff;
 }
 
-.enterBtn:hover {
+.leave {
+  font-size: 16px;
+  background-color: #7f8c8d;
+  border-radius: 0;
+  color: #fff;
+  cursor: pointer;
+  padding: 5px;
+  border: none;
+}
+
+.enterBtn:hover, .leave:hover {
   background-color: #bdc3c7;
 }
 

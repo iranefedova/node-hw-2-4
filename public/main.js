@@ -44,6 +44,14 @@ $("select#room").on("change", function(){
     return false;
   });
 
+  $('button.leave').on('click', function(){
+    $chatPage.fadeOut();
+    $loginPage.show();
+    $usernameInput.val(username);
+    $messages.empty();
+    socket.emit('leave room');
+  });
+
   function addParticipantsMessage (data) {
     var message = '';
     if (data.numUsers === 1) {
