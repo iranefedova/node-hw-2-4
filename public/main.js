@@ -18,83 +18,31 @@ $(function() {
 
   // Prompt for setting a username
   var username;
+  var room = $("select#room option:selected").val();
   var connected = false;
   var typing = false;
   var lastTypingTime;
   var $currentInput = $usernameInput;
 
-  var socket = io("/girls");
+  var socket = io();
 
 
-$("form.form").on("submit", function(){
+$("select#room").on("change", function(){
   if ($("select#room option:selected").val() == "girls") {
-    var socket = io("/girls");
+    room = "girls";
   } else if ($("select#room option:selected").val() == "boys") {
-    var socket = io("/boys");
+    room = "boys";
   } else {
-    var socket = io("/jedi");
+    room = "jedi";
   }
-
-  // Socket events
-
-  // Whenever the server emits 'login', log the login message
-  socket.on('login', function (data) {
-    connected = true;
-    // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – ";
-    log(message, {
-      prepend: true
-    });
-    addParticipantsMessage(data);
-  });
-
-  // Whenever the server emits 'new message', update the chat body
-  socket.on('new message', function (data) {
-    addChatMessage(data);
-  });
-
-  // Whenever the server emits 'user joined', log it in the chat body
-  socket.on('user joined', function (data) {
-    log(data.username + ' joined');
-    addParticipantsMessage(data);
-  });
-
-  // Whenever the server emits 'user left', log it in the chat body
-  socket.on('user left', function (data) {
-    log(data.username + ' left');
-    addParticipantsMessage(data);
-    removeChatTyping(data);
-  });
-
-  // Whenever the server emits 'typing', show the typing message
-  socket.on('typing', function (data) {
-    addChatTyping(data);
-  });
-
-  // Whenever the server emits 'stop typing', kill the typing message
-  socket.on('stop typing', function (data) {
-    removeChatTyping(data);
-  });
-
-  socket.on('disconnect', function () {
-    log('you have been disconnected');
-  });
-
-  socket.on('reconnect', function () {
-    log('you have been reconnected');
-    if (username) {
-      socket.emit('add user', username);
-    }
-  });
-
-  socket.on('reconnect_error', function () {
-    log('attempt to reconnect has failed');
-  });
-
-  // return false;
-})
+  return false;
+});
 
   // var socket = io();
+  $('form.form').on('submit', function(){
+    setUsername();
+    return false;
+  });
 
   function addParticipantsMessage (data) {
     var message = '';
@@ -111,14 +59,14 @@ $("form.form").on("submit", function(){
     username = cleanInput($usernameInput.val().trim());
 
     // If the username is valid
-    if (username) {
+    if (username && room) {
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage;
 
       // Tell the server your username
-      socket.emit('add user', username);
+      socket.emit('add user', username, room);
     }
   }
 
@@ -184,11 +132,6 @@ $("form.form").on("submit", function(){
     });
   }
 
-  // Adds a message element to the messages and scrolls to the bottom
-  // el - The element to add as a message
-  // options.fade - If the element should fade-in (default = true)
-  // options.prepend - If the element should prepend
-  //   all other messages (default = false)
   function addMessageElement (el, options) {
     var $el = $(el);
 
@@ -259,6 +202,63 @@ $("form.form").on("submit", function(){
     return COLORS[index];
   }
 
+// Socket events
+
+  // Whenever the server emits 'login', log the login message
+  socket.on('login', function (data) {
+    connected = true;
+    // Display the welcome message
+    var message = "Welcome to Awesome Chat – ";
+    log(message, {
+      prepend: true
+    });
+    addParticipantsMessage(data);
+  });
+
+  // Whenever the server emits 'new message', update the chat body
+  socket.on('new message', function (data) {
+    addChatMessage(data);
+  });
+
+  // Whenever the server emits 'user joined', log it in the chat body
+  socket.on('user joined', function (data) {
+    log(data.username + ' joined');
+    addParticipantsMessage(data);
+  });
+
+  // Whenever the server emits 'user left', log it in the chat body
+  socket.on('user left', function (data) {
+    log(data.username + ' left');
+    addParticipantsMessage(data);
+    removeChatTyping(data);
+  });
+
+  // Whenever the server emits 'typing', show the typing message
+  socket.on('typing', function (data) {
+    addChatTyping(data);
+  });
+
+  // Whenever the server emits 'stop typing', kill the typing message
+  socket.on('stop typing', function (data) {
+    removeChatTyping(data);
+  });
+
+  socket.on('disconnect', function () {
+    log('you have been disconnected');
+  });
+
+  socket.on('reconnect', function () {
+    log('you have been reconnected');
+    if (username && room) {
+      socket.emit('add user', username, room);
+    }
+  });
+
+  socket.on('reconnect_error', function () {
+    log('attempt to reconnect has failed');
+  });
+
+
   // Keyboard events
 
   $window.keydown(function (event) {
@@ -272,27 +272,12 @@ $("form.form").on("submit", function(){
         sendMessage();
         socket.emit('stop typing');
         typing = false;
-      } else {
-        setUsername();
-      }
+      };
     }
   });
 
   $inputMessage.on('input', function() {
     updateTyping();
   });
-
-  // Click events
-
-  // Focus input when clicking anywhere on login page
-  // $loginPage.click(function () {
-  //   $currentInput;
-  // });
-
-  // Focus input when clicking on the message input's border
-  // $inputMessage.click(function () {
-  //   $inputMessage.focus();
-  // });
-
 
 });
